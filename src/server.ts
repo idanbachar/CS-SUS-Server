@@ -2,11 +2,11 @@ import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
+import { GetPlayerSummaries } from "./services/steamworks";
 import {
-  GetPlayerSummaries,
   checkIsSteamProfileValid,
   getSteamIDFromURL,
-} from "./services/steamworks";
+} from "./services/validation";
 
 const app = express();
 app.use("/", express.static("public"));
