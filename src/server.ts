@@ -1,10 +1,32 @@
 import express, { Request, Response } from "express";
+import * as dotenv from "dotenv";
+dotenv.config();
+import cors from "cors";
+import {
+  GetPlayerSummaries,
+  checkIsSteamProfileValid,
+  getSteamIDFromURL,
+} from "./services/steamworks";
 
 const app = express();
+app.use("/", express.static("public"));
+app.use(cors());
+
 const PORT = 4000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send(["test"]);
+app.get("/getUser", (req: Request, res: Response) => {
+  (async () => {
+    const { steamUrl } = req.query;
+    if (steamUrl) {
+      const isSteamProfileValid = checkIsSteamProfileValid(steamUrl.toString());
+
+      if (isSteamProfileValid) {
+        const steamId = await getSteamIDFromURL(steamUrl.toString());
+        const data = await GetPlayerSummaries(steamId);
+        res.json(data);
+      }
+    }
+  })();
 });
 
 app.listen(PORT, () => {
