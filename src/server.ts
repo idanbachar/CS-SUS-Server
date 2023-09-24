@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
-import { GetFullUserData, GetSteamInventory } from "./services/steamworks";
+import { GetFullUserData } from "./services/steamworks";
 import {
   checkIsSteamProfileValid,
   getSteamIDFromURL,
