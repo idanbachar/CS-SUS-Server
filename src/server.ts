@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
-import { GetPlayerData } from "./services/steamworks";
+import { GetFullUserData, GetSteamInventory } from "./services/steamworks";
 import {
   checkIsSteamProfileValid,
   getSteamIDFromURL,
@@ -22,7 +22,7 @@ app.get("/getUser", (req: Request, res: Response) => {
 
       if (isSteamProfileValid) {
         const steamId = await getSteamIDFromURL(steamUrl.toString());
-        const playerData = await GetPlayerData(steamId);
+        const playerData = await GetFullUserData(steamId);
 
         res.json(playerData);
       } else {
