@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
-import { GetPlayerSummaries } from "./services/steamworks";
+import { GetPlayerData } from "./services/steamworks";
 import {
   checkIsSteamProfileValid,
   getSteamIDFromURL,
@@ -22,8 +22,11 @@ app.get("/getUser", (req: Request, res: Response) => {
 
       if (isSteamProfileValid) {
         const steamId = await getSteamIDFromURL(steamUrl.toString());
-        const data = await GetPlayerSummaries(steamId);
-        res.json(data);
+        const playerData = await GetPlayerData(steamId);
+
+        res.json(playerData);
+      } else {
+        res.status(500).send("<h1>Error 505 Invalid steam URL</h1>");
       }
     }
   })();

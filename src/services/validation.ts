@@ -7,7 +7,7 @@ export const checkIsSteamProfileValid = (steamURL: string) => {
   return regex.test(steamURL);
 };
 
-async function resolveVanityURL(vanityName: string) {
+const resolveVanityURL = async (vanityName: string) => {
   const endpoint = `${STEAM_BASE_URL}/ISteamUser/ResolveVanityURL/v0001/?key=${API_KEY}&vanityurl=${vanityName}`;
 
   try {
@@ -21,7 +21,7 @@ async function resolveVanityURL(vanityName: string) {
     console.error("Error resolving vanity URL:", error);
     return null;
   }
-}
+};
 
 export const getSteamIDFromURL = async (steamURL: string) => {
   const regex =
