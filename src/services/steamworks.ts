@@ -37,6 +37,9 @@ export const GetFullUserData = async (steamId: string) => {
         avatarmedium: playerData.avatarmedium,
         realname: playerData.realname,
         loccountrycode: playerData.loccountrycode,
+        country_image: playerData.loccountrycode
+          ? `https://flagcdn.com/48x36/${playerData.loccountrycode.toLowerCase()}.png`
+          : null,
         timecreated: new Date(+playerData.timecreated * 1000),
         friends:
           friendsList !== null

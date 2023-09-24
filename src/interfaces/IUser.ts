@@ -14,7 +14,8 @@ export interface IUser {
   avatarmedium: string;
   realname: string;
   timecreated: Date;
-  loccountrycode: string;
+  loccountrycode: string | null;
+  country_image: string | null;
   friends: ISteamFriend[] | null;
   vacBans: ISteamPlayerBans | null;
   games: ISteamGame[] | null;
