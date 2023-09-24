@@ -53,32 +53,36 @@ export const GetFullUserData = async (steamId: string) => {
         vacBans: playerBans,
         games:
           ownedGames !== null
-            ? ownedGames.map((game) => {
-                return {
-                  ...game,
-                  playtime_2weeks: game.playtime_2weeks
-                    ? Math.round(game.playtime_2weeks / 60)
-                    : undefined,
-                  playtime_forever:
-                    game.playtime_forever > 0
-                      ? Math.round(game.playtime_forever / 60)
-                      : 0,
-                  playtime_windows_forever:
-                    game.playtime_windows_forever > 0
-                      ? Math.round(game.playtime_windows_forever / 60)
-                      : 0,
-                  playtime_mac_forever:
-                    game.playtime_mac_forever > 0
-                      ? Math.round(game.playtime_mac_forever / 60)
-                      : 0,
-                  playtime_linux_forever:
-                    game.playtime_linux_forever > 0
-                      ? Math.round(game.playtime_linux_forever / 60)
-                      : 0,
-                  rtime_last_played: new Date(+game.rtime_last_played * 1000),
-                  img_icon_url: `http://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`,
-                };
-              })
+            ? ownedGames
+                .map((game) => {
+                  return {
+                    ...game,
+                    playtime_2weeks: game.playtime_2weeks
+                      ? Math.round(game.playtime_2weeks / 60)
+                      : undefined,
+                    playtime_forever:
+                      game.playtime_forever > 0
+                        ? Math.round(game.playtime_forever / 60)
+                        : 0,
+                    playtime_windows_forever:
+                      game.playtime_windows_forever > 0
+                        ? Math.round(game.playtime_windows_forever / 60)
+                        : 0,
+                    playtime_mac_forever:
+                      game.playtime_mac_forever > 0
+                        ? Math.round(game.playtime_mac_forever / 60)
+                        : 0,
+                    playtime_linux_forever:
+                      game.playtime_linux_forever > 0
+                        ? Math.round(game.playtime_linux_forever / 60)
+                        : 0,
+                    rtime_last_played: new Date(+game.rtime_last_played * 1000),
+                    img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${game.appid}/capsule_231x87.jpg`,
+                  };
+                })
+                .sort((a, b) => {
+                  return b.playtime_forever - a.playtime_forever;
+                })
             : null,
         inventory:
           steamInventory !== null
