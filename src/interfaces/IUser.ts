@@ -1,6 +1,7 @@
 import {
   ISteamFriend,
   ISteamGame,
+  ISteamPlayer,
   ISteamPlayerBans,
   ISteamUserInventory,
 } from "./ISteamWorks";
@@ -16,7 +17,7 @@ export interface IUser {
   timecreated: Date;
   loccountrycode: string | null;
   country_image: string | null;
-  friends: ISteamFriend[] | null;
+  friends: ISteamPlayer[] | null;
   vacBans: ISteamPlayerBans | null;
   games: ISteamGame[] | null;
   inventory: any | null;

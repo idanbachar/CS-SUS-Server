@@ -23,6 +23,7 @@ export const GetFullUserData = async (steamId: string) => {
     let fullData: IUser | null = null;
     const playerData = data[0];
     const friendsList = data[1];
+
     const playerBans = data[2];
     const ownedGames = data[3];
     const steamInventory = data[4];
@@ -41,15 +42,7 @@ export const GetFullUserData = async (steamId: string) => {
           ? `https://flagcdn.com/48x36/${playerData.loccountrycode.toLowerCase()}.png`
           : null,
         timecreated: new Date(+playerData.timecreated * 1000),
-        friends:
-          friendsList !== null
-            ? friendsList.map((friend) => {
-                return {
-                  ...friend,
-                  friend_since: new Date(+friend.friend_since * 1000),
-                };
-              })
-            : null,
+        friends: friendsList,
         vacBans: playerBans,
         games:
           ownedGames !== null
@@ -112,7 +105,7 @@ export const GetPlayerData = async (steamId: string) => {
   try {
     const response = await axios.get(endpoint);
     const players = response.data.response.players as ISteamPlayer[];
-    if (players && players.length > 0) {
+    if (players.length > 0) {
       return players[0];
     } else {
       return null;
@@ -123,11 +116,26 @@ export const GetPlayerData = async (steamId: string) => {
   }
 };
 
+export const GetPlayersData = async (steamIds: string) => {
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerSummaries/v2/?key=${API_KEY}&steamids=${steamIds}`;
+  try {
+    const response = await axios.get(endpoint);
+    const players = response.data.response.players as ISteamPlayer[];
+    return players;
+  } catch (error) {
+    console.error("Error fetching Steam user data:", error);
+    return null;
+  }
+};
+
 export const GetFriendsList = async (steamId: string) => {
   const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetFriendList/v0001/?key=${API_KEY}&steamid=${steamId}&relationship=friend`;
   try {
     const response = await axios.get(endpoint);
-    return response.data.friendslist.friends as ISteamFriend[];
+    const friends = response.data.friendslist.friends as ISteamFriend[];
+    const friendsIDS = friends.map((friend) => friend.steamid).join(",");
+    const friendsData = await GetPlayersData(friendsIDS);
+    return friendsData;
   } catch (error) {
     console.error("Error fetching friend list:", error);
     return null;
