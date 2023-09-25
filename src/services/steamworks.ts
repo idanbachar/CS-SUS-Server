@@ -4,6 +4,7 @@ import {
   ISteamGame,
   ISteamPlayer,
   ISteamPlayerBans,
+  ISteamStatsDictionary,
   ISteamUserInventory,
   ISteamUserStatsForGame,
 } from "../interfaces/ISteamWorks";
@@ -17,20 +18,21 @@ export const GetFullUserData = async (steamId: string) => {
       GetFriendsList(steamId),
       GetPlayerBans(steamId),
       GetOwnedGames(steamId),
-      GetSteamInventory(steamId, "730"),
+      GetSteamCSGOInventory(steamId),
       GetSteamLevel(steamId),
       GetTotalBadges(steamId),
+      GetStatsForCSGO(steamId),
     ]);
 
     let fullData: IUser | null = null;
     const playerData = data[0];
     const friendsList = data[1];
-
     const playerBans = data[2];
     const ownedGames = data[3];
     const steamInventory = data[4];
     const steamLevel = data[5];
     const totalBadges = data[6];
+    const csgoStats = data[7];
 
     console.log("playerData", playerData);
     console.log("friendsList", friendsList);
@@ -39,6 +41,7 @@ export const GetFullUserData = async (steamId: string) => {
     console.log("steamInventory", steamInventory);
     console.log("steamLevel", steamLevel);
     console.log("totalBadges", totalBadges);
+    console.log("csgoStats", csgoStats);
 
     if (playerData !== null) {
       fullData = {
@@ -106,6 +109,13 @@ export const GetFullUserData = async (steamId: string) => {
             : null,
         totalBadges,
         steamLevel,
+        csgoStats:
+          csgoStats !== null && csgoStats !== undefined
+            ? csgoStats.stats.reduce((result: ISteamStatsDictionary, stat) => {
+                result[stat.name] = stat.value;
+                return result;
+              }, {})
+            : null,
       };
     }
     return fullData;
@@ -179,18 +189,20 @@ export const GetOwnedGames = async (steamId: string) => {
   }
 };
 
-export const GetUserStatsForGame = async (appId: string, steamId: string) => {
+export const GetStatsForCSGO = async (steamId: string) => {
+  const appId = "730";
   const endpoint = `${STEAM_BASE_URL}/ISteamUserStats/GetUserStatsForGame/v0002/?key=${API_KEY}&appid=${appId}&steamid=${steamId}`;
   try {
     const response = await axios.get(endpoint);
-    return response.data.playerstats as ISteamUserStatsForGame[];
+    return response.data.playerstats as ISteamUserStatsForGame;
   } catch (error) {
     console.error("Error fetching game schema:");
     return null;
   }
 };
 
-export const GetSteamInventory = async (steamId: string, appID: string) => {
+export const GetSteamCSGOInventory = async (steamId: string) => {
+  const appID = "730";
   const endpoint = `https://steamcommunity.com/inventory/${steamId}/${appID}/2?l=english&count=5000`;
   console.log(endpoint);
 

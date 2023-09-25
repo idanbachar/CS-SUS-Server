@@ -1,4 +1,9 @@
-import { ISteamGame, ISteamPlayer, ISteamPlayerBans } from "./ISteamWorks";
+import {
+  ISteamGame,
+  ISteamPlayer,
+  ISteamPlayerBans,
+  ISteamStatsDictionary,
+} from "./ISteamWorks";
 
 export interface IUser {
   steamid: string;
@@ -17,4 +22,5 @@ export interface IUser {
   inventory: any | null;
   totalBadges: number;
   steamLevel: number;
+  csgoStats: ISteamStatsDictionary | null;
 }
