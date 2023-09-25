@@ -40,5 +40,5 @@ export const getSteamIDFromURL = async (steamURL: string) => {
     const steamId = await resolveVanityURL(vanityName);
     return steamId;
   }
-  return "";
+  return steamID64;
 };

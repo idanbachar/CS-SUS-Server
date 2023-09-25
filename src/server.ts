@@ -22,8 +22,9 @@ app.get("/getUser", (req: Request, res: Response) => {
 
       if (isSteamProfileValid) {
         const steamId = await getSteamIDFromURL(steamUrl.toString());
-        const playerData = await GetFullUserData(steamId);
+        console.log("steamId", steamId);
 
+        const playerData = await GetFullUserData(steamId);
         res.json(playerData);
       } else {
         res.status(500).send("<h1>Error 505 Invalid steam URL</h1>");

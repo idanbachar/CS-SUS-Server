@@ -32,6 +32,14 @@ export const GetFullUserData = async (steamId: string) => {
     const steamLevel = data[5];
     const totalBadges = data[6];
 
+    console.log("playerData", playerData);
+    console.log("friendsList", friendsList);
+    console.log("playerBans", playerBans);
+    console.log("ownedGames", ownedGames);
+    console.log("steamInventory", steamInventory);
+    console.log("steamLevel", steamLevel);
+    console.log("totalBadges", totalBadges);
+
     if (playerData !== null) {
       fullData = {
         steamid: playerData.steamid,
@@ -49,7 +57,7 @@ export const GetFullUserData = async (steamId: string) => {
         friends: friendsList,
         vacBans: playerBans,
         games:
-          ownedGames !== null
+          ownedGames !== null && ownedGames !== undefined
             ? ownedGames
                 .map((game) => {
                   return {
@@ -82,7 +90,7 @@ export const GetFullUserData = async (steamId: string) => {
                 })
             : null,
         inventory:
-          steamInventory !== null
+          steamInventory !== null && steamInventory !== undefined
             ? steamInventory.descriptions.map((item) => {
                 return {
                   icon_url: `https://steamcommunity-a.akamaihd.net/economy/image/${item.icon_url}`,
@@ -102,7 +110,8 @@ export const GetFullUserData = async (steamId: string) => {
     }
     return fullData;
   } catch (error) {
-    console.log("error", error);
+    console.log(error);
+    return null;
   }
 };
 
@@ -117,7 +126,7 @@ export const GetPlayerData = async (steamId: string) => {
       return null;
     }
   } catch (error) {
-    console.error("Error fetching Steam user data:", error);
+    console.error("Error fetching Steam user data:");
     return null;
   }
 };
@@ -129,7 +138,7 @@ export const GetPlayersData = async (steamIds: string) => {
     const players = response.data.response.players as ISteamPlayer[];
     return players;
   } catch (error) {
-    console.error("Error fetching Steam user data:", error);
+    console.error("Error fetching Steam user data:");
     return null;
   }
 };
@@ -143,7 +152,7 @@ export const GetFriendsList = async (steamId: string) => {
     const friendsData = await GetPlayersData(friendsIDS);
     return friendsData;
   } catch (error) {
-    console.error("Error fetching friend list:", error);
+    console.error("Error fetching friend list:");
     return null;
   }
 };
@@ -154,7 +163,7 @@ export const GetPlayerBans = async (steamId: string) => {
     const response = await axios.get(endpoint);
     return response.data.players[0] as ISteamPlayerBans;
   } catch (error) {
-    console.error("Error fetching player bans:", error);
+    console.error("Error fetching player bans:");
     return null;
   }
 };
@@ -165,7 +174,7 @@ export const GetOwnedGames = async (steamId: string) => {
     const response = await axios.get(endpoint);
     return response.data.response.games as ISteamGame[];
   } catch (error) {
-    console.error("Error fetching owned games:", error);
+    console.error("Error fetching owned games:");
     return null;
   }
 };
@@ -176,18 +185,20 @@ export const GetUserStatsForGame = async (appId: string, steamId: string) => {
     const response = await axios.get(endpoint);
     return response.data.playerstats as ISteamUserStatsForGame[];
   } catch (error) {
-    console.error("Error fetching game schema:", error);
+    console.error("Error fetching game schema:");
     return null;
   }
 };
 
 export const GetSteamInventory = async (steamId: string, appID: string) => {
   const endpoint = `https://steamcommunity.com/inventory/${steamId}/${appID}/2?l=english&count=5000`;
+  console.log(endpoint);
+
   try {
     const response = await axios.get(endpoint);
-    return response.data as ISteamUserInventory;
+    return response.data as ISteamUserInventory | null;
   } catch (error) {
-    console.error("Failed to fetch inventory:", error);
+    console.error("Failed to fetch inventory:");
     return null;
   }
 };
@@ -203,7 +214,7 @@ export const GetSteamLevel = async (steamId: string) => {
     const response = await axios.get(endpoint, { params });
     return response.data.response.player_level;
   } catch (error) {
-    console.error("Error fetching Steam level:", error);
+    console.error("Error fetching Steam level:");
     return null;
   }
 };
@@ -219,7 +230,7 @@ export const GetTotalBadges = async (steamId: string) => {
     const response = await axios.get(endpoint, { params });
     return response.data.response.badges.length;
   } catch (error) {
-    console.error("Error fetching badges:", error);
+    console.error("Error fetching badges:");
     return null;
   }
 };
