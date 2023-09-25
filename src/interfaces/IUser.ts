@@ -1,10 +1,4 @@
-import {
-  ISteamFriend,
-  ISteamGame,
-  ISteamPlayer,
-  ISteamPlayerBans,
-  ISteamUserInventory,
-} from "./ISteamWorks";
+import { ISteamGame, ISteamPlayer, ISteamPlayerBans } from "./ISteamWorks";
 
 export interface IUser {
   steamid: string;
@@ -21,4 +15,6 @@ export interface IUser {
   vacBans: ISteamPlayerBans | null;
   games: ISteamGame[] | null;
   inventory: any | null;
+  totalBadges: number;
+  steamLevel: number;
 }

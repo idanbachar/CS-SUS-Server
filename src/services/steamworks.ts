@@ -18,6 +18,8 @@ export const GetFullUserData = async (steamId: string) => {
       GetPlayerBans(steamId),
       GetOwnedGames(steamId),
       GetSteamInventory(steamId, "730"),
+      GetSteamLevel(steamId),
+      GetTotalBadges(steamId),
     ]);
 
     let fullData: IUser | null = null;
@@ -27,6 +29,8 @@ export const GetFullUserData = async (steamId: string) => {
     const playerBans = data[2];
     const ownedGames = data[3];
     const steamInventory = data[4];
+    const steamLevel = data[5];
+    const totalBadges = data[6];
 
     if (playerData !== null) {
       fullData = {
@@ -92,6 +96,8 @@ export const GetFullUserData = async (steamId: string) => {
                 };
               })
             : null,
+        totalBadges,
+        steamLevel,
       };
     }
     return fullData;
@@ -182,6 +188,38 @@ export const GetSteamInventory = async (steamId: string, appID: string) => {
     return response.data as ISteamUserInventory;
   } catch (error) {
     console.error("Failed to fetch inventory:", error);
+    return null;
+  }
+};
+
+export const GetSteamLevel = async (steamId: string) => {
+  const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetSteamLevel/v1/`;
+  const params = {
+    key: API_KEY,
+    steamid: steamId,
+  };
+
+  try {
+    const response = await axios.get(endpoint, { params });
+    return response.data.response.player_level;
+  } catch (error) {
+    console.error("Error fetching Steam level:", error);
+    return null;
+  }
+};
+
+export const GetTotalBadges = async (steamId: string) => {
+  const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetBadges/v1/`;
+  const params = {
+    key: API_KEY,
+    steamid: steamId,
+  };
+
+  try {
+    const response = await axios.get(endpoint, { params });
+    return response.data.response.badges.length;
+  } catch (error) {
+    console.error("Error fetching badges:", error);
     return null;
   }
 };
