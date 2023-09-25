@@ -84,9 +84,25 @@ app.get("/getUser", (req: Request, res: Response) => {
   })();
 });
 
+const objectToQueryString = (obj: Record<string, any>): string => {
+  return Object.entries(obj)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join("&");
+};
+
 app.get("/login-succeed", (req, res) => {
   if (req.isAuthenticated()) {
-    res.json(req.user);
+    const queryParams = new URLSearchParams(
+      objectToQueryString(req.user)
+    ).toString();
+    res.redirect(
+      `http://localhost:3000/login-succeed?${JSON.stringify(
+        (req.user as any)._json
+      )}`
+    );
   } else {
     res.send("Not authenticated.");
   }
