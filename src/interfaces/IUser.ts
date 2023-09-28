@@ -1,4 +1,5 @@
 import {
+  IInventoryItem,
   ISteamGame,
   ISteamPlayer,
   ISteamPlayerBans,
@@ -19,7 +20,7 @@ export interface IUser {
   friends: ISteamPlayer[] | null;
   vacBans: ISteamPlayerBans | null;
   games: ISteamGame[] | null;
-  inventory: any | null;
+  inventory: IInventoryItem[] | null;
   totalBadges: number;
   steamLevel: number;
   csgoStats: ISteamStatsDictionary | null;

@@ -10,6 +10,7 @@ import {
 } from "../interfaces/ISteamWorks";
 import { API_KEY, STEAM_BASE_URL } from "./general";
 import { IUser } from "../interfaces/IUser";
+import { CreateUserForClient } from "./userDataMappingService";
 
 export const GetFullUserData = async (steamId: string) => {
   try {
@@ -18,21 +19,20 @@ export const GetFullUserData = async (steamId: string) => {
       GetFriendsList(steamId),
       GetPlayerBans(steamId),
       GetOwnedGames(steamId),
-      GetSteamCSGOInventory(steamId),
       GetSteamLevel(steamId),
       GetTotalBadges(steamId),
       GetStatsForCSGO(steamId),
+      // GetSteamCSGOInventory(steamId),
     ]);
 
-    let fullData: IUser | null = null;
     const playerData = data[0];
     const friendsList = data[1];
     const playerBans = data[2];
     const ownedGames = data[3];
-    const steamInventory = data[4];
-    const steamLevel = data[5];
-    const totalBadges = data[6];
-    const csgoStats = data[7];
+    const steamLevel = data[4];
+    const totalBadges = data[5];
+    const csgoStats = data[6];
+    const steamInventory = null; //data[7];
 
     console.log("playerData", playerData);
     console.log("friendsList", friendsList);
@@ -43,81 +43,17 @@ export const GetFullUserData = async (steamId: string) => {
     console.log("totalBadges", totalBadges);
     console.log("csgoStats", csgoStats);
 
-    if (playerData !== null) {
-      fullData = {
-        steamid: playerData.steamid,
-        personaname: playerData.personaname,
-        profileurl: playerData.profileurl,
-        avatar: playerData.avatar,
-        avatarfull: playerData.avatarfull,
-        avatarmedium: playerData.avatarmedium,
-        realname: playerData.realname,
-        loccountrycode: playerData.loccountrycode,
-        country_image: playerData.loccountrycode
-          ? `https://flagcdn.com/48x36/${playerData.loccountrycode.toLowerCase()}.png`
-          : null,
-        timecreated: new Date(+playerData.timecreated * 1000),
-        friends: friendsList,
-        vacBans: playerBans,
-        games:
-          ownedGames !== null && ownedGames !== undefined
-            ? ownedGames
-                .map((game) => {
-                  return {
-                    ...game,
-                    playtime_2weeks: game.playtime_2weeks
-                      ? Math.round(game.playtime_2weeks / 60)
-                      : undefined,
-                    playtime_forever:
-                      game.playtime_forever > 0
-                        ? Math.round(game.playtime_forever / 60)
-                        : 0,
-                    playtime_windows_forever:
-                      game.playtime_windows_forever > 0
-                        ? Math.round(game.playtime_windows_forever / 60)
-                        : 0,
-                    playtime_mac_forever:
-                      game.playtime_mac_forever > 0
-                        ? Math.round(game.playtime_mac_forever / 60)
-                        : 0,
-                    playtime_linux_forever:
-                      game.playtime_linux_forever > 0
-                        ? Math.round(game.playtime_linux_forever / 60)
-                        : 0,
-                    rtime_last_played: new Date(+game.rtime_last_played * 1000),
-                    img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${game.appid}/capsule_231x87.jpg`,
-                  };
-                })
-                .sort((a, b) => {
-                  return b.playtime_forever - a.playtime_forever;
-                })
-            : null,
-        inventory:
-          steamInventory !== null && steamInventory !== undefined
-            ? steamInventory.descriptions.map((item) => {
-                return {
-                  icon_url: `https://steamcommunity-a.akamaihd.net/economy/image/${item.icon_url}`,
-                  icon_url_large: `https://steamcommunity-a.akamaihd.net/economy/image/${item.icon_url_large}`,
-                  name: item.name,
-                  name_color: item.name_color,
-                  type: item.type,
-                  tradable: item.tradable,
-                  marketable: item.marketable,
-                  tags: item.tags,
-                };
-              })
-            : null,
-        totalBadges,
-        steamLevel,
-        csgoStats:
-          csgoStats !== null && csgoStats !== undefined
-            ? csgoStats.stats.reduce((result: ISteamStatsDictionary, stat) => {
-                result[stat.name] = stat.value;
-                return result;
-              }, {})
-            : null,
-      };
-    }
+    const fullData = CreateUserForClient({
+      playerData,
+      friendsList,
+      playerBans,
+      ownedGames,
+      steamLevel,
+      totalBadges,
+      csgoStats,
+      steamInventory,
+    });
+
     return fullData;
   } catch (error) {
     console.log(error);
@@ -224,7 +160,7 @@ export const GetSteamLevel = async (steamId: string) => {
 
   try {
     const response = await axios.get(endpoint, { params });
-    return response.data.response.player_level;
+    return response.data.response.player_level as number | null;
   } catch (error) {
     console.error("Error fetching Steam level:");
     return null;
@@ -240,7 +176,7 @@ export const GetTotalBadges = async (steamId: string) => {
 
   try {
     const response = await axios.get(endpoint, { params });
-    return response.data.response.badges.length;
+    return response.data.response.badges.length as number | null;
   } catch (error) {
     console.error("Error fetching badges:");
     return null;

@@ -18,6 +18,9 @@ const PORT = 4000;
 // });
 
 const app = express();
+app.use("/", express.static("public"));
+app.use(cors());
+
 app.use(
   session({
     secret: TOKEN!,
@@ -27,14 +30,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((obj: any, done) => {
-  done(null, obj);
-});
 
 passport.use(
   new Strategy(
@@ -49,19 +44,30 @@ passport.use(
   )
 );
 
-app.use("/", express.static("public"));
-app.use(cors());
-
-app.get("/auth/steam", passport.authenticate("steam"), (req, res) => {
-  // Handle login success
-  res.json(req.user);
+passport.serializeUser((user, done) => {
+  done(null, user);
 });
+
+passport.deserializeUser((obj: any, done) => {
+  done(null, obj);
+});
+
+app.get("/auth/steam", passport.authenticate("steam"));
 
 app.get(
   "/auth/steam/return",
-  passport.authenticate("steam", { failureRedirect: "/" }),
-  (req, res) => {
-    res.redirect("/login-succeed");
+  passport.authenticate("steam", {
+    failureRedirect: "/",
+  }),
+  (req: any, res) => {
+    const { displayName, id, photos } = req.user;
+    const avatar = photos && photos.length ? photos[0].value : null;
+
+    console.log("user", req.user);
+    
+    res.redirect(
+      `http://localhost:3000/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}`
+    );
   }
 );
 
@@ -82,30 +88,6 @@ app.get("/getUser", (req: Request, res: Response) => {
       }
     }
   })();
-});
-
-const objectToQueryString = (obj: Record<string, any>): string => {
-  return Object.entries(obj)
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
-    )
-    .join("&");
-};
-
-app.get("/login-succeed", (req, res) => {
-  if (req.isAuthenticated()) {
-    const queryParams = new URLSearchParams(
-      objectToQueryString(req.user)
-    ).toString();
-    res.redirect(
-      `http://localhost:3000/login-succeed?${JSON.stringify(
-        (req.user as any)._json
-      )}`
-    );
-  } else {
-    res.send("Not authenticated.");
-  }
 });
 
 app.listen(PORT, () => {
