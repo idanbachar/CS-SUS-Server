@@ -21,7 +21,7 @@ export const GetFullUserData = async (steamId: string) => {
       GetOwnedGames(steamId),
       GetSteamLevel(steamId),
       GetTotalBadges(steamId),
-      GetStatsForCSGO(steamId),
+      GetStatsForCS2(steamId),
       // GetSteamCSGOInventory(steamId),
     ]);
 
@@ -31,7 +31,7 @@ export const GetFullUserData = async (steamId: string) => {
     const ownedGames = data[3];
     const steamLevel = data[4];
     const totalBadges = data[5];
-    const csgoStats = data[6];
+    const cs2Stats = data[6];
     const steamInventory = null; //data[7];
 
     const fullData = CreateUserForClient({
@@ -41,7 +41,7 @@ export const GetFullUserData = async (steamId: string) => {
       ownedGames,
       steamLevel,
       totalBadges,
-      cs2Stats: csgoStats,
+      cs2Stats,
       steamInventory,
     });
 
@@ -116,7 +116,7 @@ export const GetOwnedGames = async (steamId: string) => {
   }
 };
 
-export const GetStatsForCSGO = async (steamId: string) => {
+export const GetStatsForCS2 = async (steamId: string) => {
   const appId = "730";
   const endpoint = `${STEAM_BASE_URL}/ISteamUserStats/GetUserStatsForGame/v0002/?key=${API_KEY}&appid=${appId}&steamid=${steamId}`;
   try {

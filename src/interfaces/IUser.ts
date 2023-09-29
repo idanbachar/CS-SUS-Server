@@ -20,8 +20,22 @@ export interface IUser {
   friends: ISteamPlayer[] | null;
   vacBans: ISteamPlayerBans | null;
   games: ISteamGame[] | null;
+  cs2: ICS2 | null;
   inventory: IInventoryItem[] | null;
-  totalBadges: number;
-  steamLevel: number;
-  csgoStats: ISteamStatsDictionary | null;
+  totalBadges: number | null;
+  steamLevel: number | null;
+  total_games: number | null;
+  cheater_percentage: number;
+}
+export interface ICS2 {
+  appid: number;
+  name: string;
+  playtime_forever: number;
+  img_icon_url: string;
+  stats: {
+    total_wins: number;
+    total_kills_headshot: number;
+    headshot_precentage: number;
+    total_kills: number;
+  } | null;
 }

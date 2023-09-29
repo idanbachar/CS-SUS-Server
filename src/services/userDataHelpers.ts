@@ -5,13 +5,16 @@ import {
   ISteamStatsDictionary,
   ISteamUserStatsForGame,
 } from "../interfaces/ISteamWorks";
+import { IUser } from "../interfaces/IUser";
 import { GetTimeStampInHours } from "./dateService";
 
 const GetCounterStrike2Game = (
-  ownedGames: ISteamGame[] | null,
+  ownedGames: ISteamGame[] | null | undefined,
   cs2Stats: ISteamUserStatsForGame | null
 ) => {
-  if (ownedGames === null) return null;
+  console.log("ownedGames", ownedGames);
+
+  if (ownedGames === null || ownedGames === undefined) return null;
   const cs2 = ownedGames.find((game) => game.appid === 730);
   if (cs2 === undefined) return null;
   return {
@@ -42,6 +45,75 @@ const GetCounterStrike2Stats = (stats: ISteamUserStatsForGame | null) => {
     ),
     total_kills: statsDictionary["total_kills"],
   };
+};
+
+const GetSusInfo = (fullData: IUser) => {
+  let totalScore = 0;
+  const ban_perc = 100;
+  const friends_perc = 10;
+  const badges_perc = 10;
+  const games_perc = 30;
+  const years_perc = 15;
+  const wins_perc = 5;
+  const headshots_perc = 5;
+  const kills_perc = 5;
+  const total_play_perc = 15;
+
+  const years_of_service =
+    new Date().getFullYear() - fullData.timecreated.getFullYear();
+  if (fullData.vacBans !== null) {
+    if (
+      fullData.vacBans.NumberOfVACBans > 0 ||
+      fullData.vacBans.NumberOfGameBans > 0
+    ) {
+      totalScore += ban_perc;
+      console.log("total score", totalScore);
+
+      return totalScore;
+    }
+  }
+
+  if (years_of_service < 3) {
+    totalScore += years_perc;
+  }
+
+  if (fullData.total_games === null) {
+    totalScore += years_perc;
+  } else {
+    if (fullData.total_games < 3) {
+      totalScore += years_perc + games_perc;
+    }
+  }
+  if (fullData.friends === null) {
+    totalScore += friends_perc;
+  } else {
+    if (fullData.friends.length < 5) {
+      totalScore += friends_perc;
+    }
+  }
+  if (fullData.totalBadges === null) {
+    totalScore += badges_perc;
+  } else {
+    if (fullData.totalBadges < 4) {
+      totalScore += badges_perc;
+    }
+  }
+  if (fullData.cs2 === null) {
+    totalScore += games_perc;
+  } else {
+    if (fullData.cs2.stats === null) {
+      totalScore += wins_perc + headshots_perc + kills_perc;
+    } else {
+      if (wins_perc > 60) {
+        totalScore += wins_perc + headshots_perc + kills_perc + years_perc;
+      }
+    }
+    if (fullData.cs2.playtime_forever < 500) {
+      totalScore += total_play_perc;
+    }
+  }
+  console.log("total score", totalScore);
+  return totalScore;
 };
 
 interface ICreateUserParams {
@@ -86,11 +158,7 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
     vacBans: playerBans,
     games:
       ownedGames !== null && ownedGames !== undefined
-        ? ownedGames
-            .sort((a, b) => b.playtime_forever - a.playtime_forever)
-            .sort((a, b) => {
-              return b.playtime_forever - a.playtime_forever;
-            })
+        ? ownedGames.sort((a, b) => b.playtime_forever - a.playtime_forever)
         : null,
     cs2,
     inventory: null,
@@ -110,11 +178,15 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
     //       })
     //     : null,
     totalBadges,
+    cheater_percentage: 0,
     steamLevel,
     total_games:
       ownedGames !== null && ownedGames !== undefined
         ? ownedGames.length
         : null,
-  };
-  return fullData;
+  } as IUser;
+
+  const cheater_percentage = GetSusInfo(fullData);
+
+  return { ...fullData, cheater_percentage };
 };
