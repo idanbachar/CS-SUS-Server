@@ -60,13 +60,12 @@ app.get(
     failureRedirect: "/",
   }),
   (req: any, res) => {
-    const { displayName, id, photos } = req.user;
+    const { displayName, id, photos, _json } = req.user;
     const avatar = photos && photos.length ? photos[0].value : null;
+    const profileurl = _json.profileurl;
 
-    console.log("user", req.user);
-    
     res.redirect(
-      `http://localhost:3000/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}`
+      `http://localhost:3000/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}&profileurl=${profileurl}`
     );
   }
 );

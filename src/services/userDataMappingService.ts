@@ -18,6 +18,21 @@ interface ICreateUserParams {
   steamInventory: null;
 }
 
+const GetGameUppgradedObject = (game: ISteamGame) => {
+  return {
+    ...game,
+    playtime_2weeks: GetTimeStampInHours(game.playtime_2weeks),
+    playtime_forever: GetTimeStampInHours(game.playtime_forever),
+    playtime_windows_forever: GetTimeStampInHours(
+      game.playtime_windows_forever
+    ),
+    playtime_mac_forever: GetTimeStampInHours(game.playtime_mac_forever),
+    playtime_linux_forever: GetTimeStampInHours(game.playtime_linux_forever),
+    rtime_last_played: new Date(+game.rtime_last_played * 1000),
+    img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${game.appid}/capsule_231x87.jpg`,
+  };
+};
+
 export const CreateUserForClient = (props: ICreateUserParams) => {
   const {
     playerData,
@@ -30,6 +45,14 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
     steamInventory,
   } = props;
   if (playerData === null) return null;
+
+  let cs2;
+  if (ownedGames !== null && ownedGames !== undefined) {
+    const cs2Game = ownedGames.find((game) => game.appid === 730);
+    if (cs2Game) {
+      cs2 = GetGameUppgradedObject(cs2Game);
+    }
+  }
 
   const fullData = {
     steamid: playerData.steamid,
@@ -50,29 +73,12 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
       ownedGames !== null && ownedGames !== undefined
         ? ownedGames
             .sort((a, b) => b.playtime_forever - a.playtime_forever)
-            .slice(0, 5)
-            .map((game) => {
-              return {
-                ...game,
-                playtime_2weeks: GetTimeStampInHours(game.playtime_2weeks),
-                playtime_forever: GetTimeStampInHours(game.playtime_forever),
-                playtime_windows_forever: GetTimeStampInHours(
-                  game.playtime_windows_forever
-                ),
-                playtime_mac_forever: GetTimeStampInHours(
-                  game.playtime_mac_forever
-                ),
-                playtime_linux_forever: GetTimeStampInHours(
-                  game.playtime_linux_forever
-                ),
-                rtime_last_played: new Date(+game.rtime_last_played * 1000),
-                img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${game.appid}/capsule_231x87.jpg`,
-              };
-            })
+            .map((game) => GetGameUppgradedObject(game))
             .sort((a, b) => {
               return b.playtime_forever - a.playtime_forever;
             })
         : null,
+    cs2,
     inventory: null,
     // inventory:
     //   steamInventory !== null && steamInventory !== undefined

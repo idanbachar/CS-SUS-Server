@@ -34,14 +34,14 @@ export const GetFullUserData = async (steamId: string) => {
     const csgoStats = data[6];
     const steamInventory = null; //data[7];
 
-    console.log("playerData", playerData);
-    console.log("friendsList", friendsList);
-    console.log("playerBans", playerBans);
-    console.log("ownedGames", ownedGames);
-    console.log("steamInventory", steamInventory);
-    console.log("steamLevel", steamLevel);
-    console.log("totalBadges", totalBadges);
-    console.log("csgoStats", csgoStats);
+    // console.log("playerData", playerData);
+    // console.log("friendsList", friendsList);
+    // console.log("playerBans", playerBans);
+    // console.log("ownedGames", ownedGames);
+    // console.log("steamInventory", steamInventory);
+    // console.log("steamLevel", steamLevel);
+    // console.log("totalBadges", totalBadges);
+    // console.log("csgoStats", csgoStats);
 
     const fullData = CreateUserForClient({
       playerData,
