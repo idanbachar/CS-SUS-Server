@@ -7,6 +7,43 @@ import {
 } from "../interfaces/ISteamWorks";
 import { GetTimeStampInHours } from "./dateService";
 
+const GetCounterStrike2Game = (
+  ownedGames: ISteamGame[] | null,
+  cs2Stats: ISteamUserStatsForGame | null
+) => {
+  if (ownedGames === null) return null;
+  const cs2 = ownedGames.find((game) => game.appid === 730);
+  if (cs2 === undefined) return null;
+  return {
+    appid: cs2.appid,
+    name: cs2.name,
+    playtime_forever: GetTimeStampInHours(cs2.playtime_forever),
+    img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${cs2.appid}/capsule_231x87.jpg`,
+    stats: GetCounterStrike2Stats(cs2Stats),
+  };
+};
+
+const GetCounterStrike2Stats = (stats: ISteamUserStatsForGame | null) => {
+  if (stats === null) return null;
+  const statsDictionary = stats.stats.reduce(
+    (result: ISteamStatsDictionary, stat) => {
+      result[stat.name] = stat.value;
+      return result;
+    },
+    {}
+  );
+  return {
+    total_wins: statsDictionary["total_wins"],
+    total_kills_headshot: statsDictionary["total_kills_headshot"],
+    headshot_precentage: Math.round(
+      (statsDictionary["total_kills_headshot"] /
+        statsDictionary["total_kills"]) *
+        100
+    ),
+    total_kills: statsDictionary["total_kills"],
+  };
+};
+
 interface ICreateUserParams {
   playerData: ISteamPlayer | null;
   friendsList: ISteamPlayer[] | null;
@@ -14,25 +51,9 @@ interface ICreateUserParams {
   ownedGames: ISteamGame[] | null;
   steamLevel: number | null;
   totalBadges: number | null;
-  csgoStats: ISteamUserStatsForGame | null;
+  cs2Stats: ISteamUserStatsForGame | null;
   steamInventory: null;
 }
-
-const GetGameUppgradedObject = (game: ISteamGame) => {
-  return {
-    ...game,
-    playtime_2weeks: GetTimeStampInHours(game.playtime_2weeks),
-    playtime_forever: GetTimeStampInHours(game.playtime_forever),
-    playtime_windows_forever: GetTimeStampInHours(
-      game.playtime_windows_forever
-    ),
-    playtime_mac_forever: GetTimeStampInHours(game.playtime_mac_forever),
-    playtime_linux_forever: GetTimeStampInHours(game.playtime_linux_forever),
-    rtime_last_played: new Date(+game.rtime_last_played * 1000),
-    img_icon_url: `https://steamcdn-a.akamaihd.net/steam/apps/${game.appid}/capsule_231x87.jpg`,
-  };
-};
-
 export const CreateUserForClient = (props: ICreateUserParams) => {
   const {
     playerData,
@@ -41,18 +62,12 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
     ownedGames,
     steamLevel,
     totalBadges,
-    csgoStats,
+    cs2Stats,
     steamInventory,
   } = props;
   if (playerData === null) return null;
 
-  let cs2;
-  if (ownedGames !== null && ownedGames !== undefined) {
-    const cs2Game = ownedGames.find((game) => game.appid === 730);
-    if (cs2Game) {
-      cs2 = GetGameUppgradedObject(cs2Game);
-    }
-  }
+  const cs2 = GetCounterStrike2Game(ownedGames, cs2Stats);
 
   const fullData = {
     steamid: playerData.steamid,
@@ -73,7 +88,6 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
       ownedGames !== null && ownedGames !== undefined
         ? ownedGames
             .sort((a, b) => b.playtime_forever - a.playtime_forever)
-            .map((game) => GetGameUppgradedObject(game))
             .sort((a, b) => {
               return b.playtime_forever - a.playtime_forever;
             })
@@ -97,13 +111,6 @@ export const CreateUserForClient = (props: ICreateUserParams) => {
     //     : null,
     totalBadges,
     steamLevel,
-    csgoStats:
-      csgoStats !== null && csgoStats !== undefined
-        ? csgoStats.stats.reduce((result: ISteamStatsDictionary, stat) => {
-            result[stat.name] = stat.value;
-            return result;
-          }, {})
-        : null,
     total_games:
       ownedGames !== null && ownedGames !== undefined
         ? ownedGames.length

@@ -10,7 +10,7 @@ import {
 } from "../interfaces/ISteamWorks";
 import { API_KEY, STEAM_BASE_URL } from "./general";
 import { IUser } from "../interfaces/IUser";
-import { CreateUserForClient } from "./userDataMappingService";
+import { CreateUserForClient } from "./userDataHelpers";
 
 export const GetFullUserData = async (steamId: string) => {
   try {
@@ -34,15 +34,6 @@ export const GetFullUserData = async (steamId: string) => {
     const csgoStats = data[6];
     const steamInventory = null; //data[7];
 
-    // console.log("playerData", playerData);
-    // console.log("friendsList", friendsList);
-    // console.log("playerBans", playerBans);
-    // console.log("ownedGames", ownedGames);
-    // console.log("steamInventory", steamInventory);
-    // console.log("steamLevel", steamLevel);
-    // console.log("totalBadges", totalBadges);
-    // console.log("csgoStats", csgoStats);
-
     const fullData = CreateUserForClient({
       playerData,
       friendsList,
@@ -50,7 +41,7 @@ export const GetFullUserData = async (steamId: string) => {
       ownedGames,
       steamLevel,
       totalBadges,
-      csgoStats,
+      cs2Stats: csgoStats,
       steamInventory,
     });
 
