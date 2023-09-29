@@ -12,8 +12,6 @@ const GetCounterStrike2Game = (
   ownedGames: ISteamGame[] | null | undefined,
   cs2Stats: ISteamUserStatsForGame | null
 ) => {
-  console.log("ownedGames", ownedGames);
-
   if (ownedGames === null || ownedGames === undefined) return null;
   const cs2 = ownedGames.find((game) => game.appid === 730);
   if (cs2 === undefined) return null;
@@ -28,6 +26,7 @@ const GetCounterStrike2Game = (
 
 const GetCounterStrike2Stats = (stats: ISteamUserStatsForGame | null) => {
   if (stats === null) return null;
+  if (stats.stats === null || stats.stats === undefined) return null;
   const statsDictionary = stats.stats.reduce(
     (result: ISteamStatsDictionary, stat) => {
       result[stat.name] = stat.value;
@@ -52,12 +51,13 @@ const GetSusInfo = (fullData: IUser) => {
   const ban_perc = 100;
   const friends_perc = 10;
   const badges_perc = 10;
-  const games_perc = 30;
+  const games_perc = 40;
+  const level_perc = 20;
   const years_perc = 15;
-  const wins_perc = 5;
-  const headshots_perc = 5;
-  const kills_perc = 5;
-  const total_play_perc = 15;
+  const wins_perc = 20;
+  const headshots_perc = 15;
+  const kills_perc = 12;
+  const total_play_perc = 40;
 
   const years_of_service =
     new Date().getFullYear() - fullData.timecreated.getFullYear();
@@ -67,10 +67,23 @@ const GetSusInfo = (fullData: IUser) => {
       fullData.vacBans.NumberOfGameBans > 0
     ) {
       totalScore += ban_perc;
-      console.log("total score", totalScore);
 
       return totalScore;
     }
+  }
+
+  if (
+    // fullData.inventory === null &&
+    fullData.games === null &&
+    fullData.friends === null &&
+    fullData.totalBadges === null
+  ) {
+    totalScore += 95;
+    return totalScore;
+  }
+
+  if (fullData.cs2 === null && fullData.games !== null) {
+    return totalScore;
   }
 
   if (years_of_service < 3) {
@@ -91,6 +104,13 @@ const GetSusInfo = (fullData: IUser) => {
       totalScore += friends_perc;
     }
   }
+  if (fullData.games === null) {
+    totalScore += games_perc;
+  } else {
+    if (fullData.games.length < 3) {
+      totalScore += games_perc;
+    }
+  }
   if (fullData.totalBadges === null) {
     totalScore += badges_perc;
   } else {
@@ -98,22 +118,28 @@ const GetSusInfo = (fullData: IUser) => {
       totalScore += badges_perc;
     }
   }
-  if (fullData.cs2 === null) {
-    totalScore += games_perc;
+  if (fullData.steamLevel === null) {
+    totalScore += level_perc;
   } else {
+    if (fullData.steamLevel < 5) {
+      totalScore += level_perc;
+    }
+  }
+  if (fullData.cs2 !== null) {
     if (fullData.cs2.stats === null) {
-      totalScore += wins_perc + headshots_perc + kills_perc;
+      totalScore += (wins_perc + headshots_perc + kills_perc) / 3;
     } else {
       if (wins_perc > 60) {
-        totalScore += wins_perc + headshots_perc + kills_perc + years_perc;
+        totalScore +=
+          (wins_perc + headshots_perc + kills_perc + years_perc) / 4;
       }
     }
-    if (fullData.cs2.playtime_forever < 500) {
+    if (fullData.cs2.playtime_forever < 600) {
       totalScore += total_play_perc;
     }
   }
-  console.log("total score", totalScore);
-  return totalScore;
+
+  return totalScore > 100 ? 100 : Math.round(totalScore);
 };
 
 interface ICreateUserParams {

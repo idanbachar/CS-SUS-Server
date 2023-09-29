@@ -9,7 +9,7 @@ import {
 } from "./services/validation";
 import passport from "passport";
 import { Strategy } from "passport-steam";
-import { API_KEY, TOKEN } from "./services/general";
+import { API_KEY, DOMAIN, TOKEN } from "./services/general";
 import session from "express-session";
 const PORT = 4000;
 
@@ -61,11 +61,11 @@ app.get(
   }),
   (req: any, res) => {
     const { displayName, id, photos, _json } = req.user;
-    const avatar = photos && photos.length ? photos[0].value : null;
+    const avatar = photos && photos.length ? photos[2].value : null;
     const profileurl = _json.profileurl;
 
     res.redirect(
-      `http://localhost:3000/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}&profileurl=${profileurl}`
+      `${DOMAIN}/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}&profileurl=${profileurl}`
     );
   }
 );
@@ -78,8 +78,6 @@ app.get("/getUser", (req: Request, res: Response) => {
 
       if (isSteamProfileValid) {
         const steamId = await getSteamIDFromURL(steamUrl.toString());
-        console.log("steamId", steamId);
-
         const playerData = await GetFullUserData(steamId);
         res.json(playerData);
       } else {
