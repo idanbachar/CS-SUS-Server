@@ -12,6 +12,7 @@ export interface ISteamPlayer {
   timecreated: number | Date;
   personastateflags: number;
   loccountrycode: string;
+  vacBans: ISteamPlayerBans;
 }
 
 export interface ISteamFriend {

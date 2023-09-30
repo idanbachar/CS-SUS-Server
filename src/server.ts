@@ -2,7 +2,11 @@ import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
-import { GetFullUserData, GetPlayersData } from "./services/steamworks";
+import {
+  GetFullUserData,
+  GetPlayerBans,
+  GetPlayersData,
+} from "./services/steamworks";
 import {
   checkIsSteamProfileValid,
   getSteamIDFromURL,
@@ -11,6 +15,7 @@ import passport from "passport";
 import { Strategy } from "passport-steam";
 import { API_KEY, DOMAIN, TOKEN } from "./services/general";
 import session from "express-session";
+import axios from "axios";
 const PORT = 4000;
 
 // require("crypto").randomBytes(48, function (err: any, buffer: any) {
@@ -92,7 +97,22 @@ app.get("/getUsers", (req: Request, res: Response) => {
     const { steamUrls } = req.query;
     if (steamUrls) {
       const players = await GetPlayersData(steamUrls.toString());
-      res.json(players);
+      let playersData;
+      if (players !== null) {
+        const ids = players.map((player) => player.steamid);
+        const requests = ids.map((id) => {
+          return GetPlayerBans(id);
+        });
+
+        const vacBans = await Promise.all(requests);
+        playersData = [...players].map((player) => {
+          return {
+            ...player,
+            vacBans: vacBans.find((ban) => ban?.SteamId === player.steamid),
+          };
+        });
+      }
+      res.json(playersData);
     }
   })();
 });
