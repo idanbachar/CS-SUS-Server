@@ -159,8 +159,5 @@ app.get("/getUsers", (req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
-  setInterval(() => {
-    console.log("1 minute passed");
-  }, 60000);
   console.log(`Server is running on http://localhost:${PORT}`);
 });
