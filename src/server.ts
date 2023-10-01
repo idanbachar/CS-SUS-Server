@@ -13,11 +13,21 @@ import {
 } from "./services/validation";
 import passport from "passport";
 import { Strategy } from "passport-steam";
-import { API_KEY, DOMAIN, TOKEN } from "./services/general";
+import {
+  API_KEY,
+  DOMAIN,
+  SMTP_DEFAULT_PASSWORD,
+  SMTP_DEFAULT_SENDER,
+  SMTP_HOSTNAME,
+  SMTP_PORT,
+  SMTP_USERNAME,
+  TOKEN,
+} from "./services/general";
 import session from "express-session";
 const PORT = 4000;
 import nodemailer from "nodemailer";
 import bodyParser from "body-parser";
+import smtpTransport from "nodemailer-smtp-transport";
 
 // require("crypto").randomBytes(48, function (err: any, buffer: any) {
 //   TOKEN = buffer.toString("hex");
@@ -28,32 +38,33 @@ app.use("/", express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "",
-    pass: "",
-  },
-});
-
-app.post("/sendemail", (req, res) => {
+app.post("/send-email", async (req, res) => {
   const { to, subject, text } = req.body;
 
-  const mailOptions = {
-    from: "",
-    to,
-    subject,
-    text,
-  };
+  const transporter = nodemailer.createTransport(
+    smtpTransport({
+      host: SMTP_HOSTNAME,
+      port: +SMTP_PORT!,
+      secure: false,
+      auth: {
+        user: SMTP_USERNAME,
+        pass: SMTP_DEFAULT_PASSWORD,
+      },
+    })
+  );
 
-  transporter.sendMail(mailOptions, (error: any, info: any) => {
-    if (error) {
-      console.log(error);
-      res.status(500).send("Email sending failed");
-    } else {
-      res.send("Email sent successfully");
-    }
-  });
+  try {
+    await transporter.sendMail({
+      from: SMTP_DEFAULT_SENDER,
+      to,
+      subject,
+      text,
+    });
+
+    res.status(200).send("Email sent successfully");
+  } catch (error) {
+    res.status(500).send("Failed to send email");
+  }
 });
 
 app.use(
