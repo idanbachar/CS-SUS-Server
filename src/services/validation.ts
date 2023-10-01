@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_KEY, STEAM_BASE_URL } from "./general";
+import { STEAM_API_KEY, STEAM_BASE_URL } from "./general";
 
 export const checkIsSteamProfileValid = (steamURL: string) => {
   const regex =
@@ -8,7 +8,7 @@ export const checkIsSteamProfileValid = (steamURL: string) => {
 };
 
 const resolveVanityURL = async (vanityName: string) => {
-  const endpoint = `${STEAM_BASE_URL}/ISteamUser/ResolveVanityURL/v0001/?key=${API_KEY}&vanityurl=${vanityName}`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/ResolveVanityURL/v0001/?key=${STEAM_API_KEY}&vanityurl=${vanityName}`;
 
   try {
     const response = await axios.get(endpoint);

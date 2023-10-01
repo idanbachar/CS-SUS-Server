@@ -14,14 +14,14 @@ import {
 import passport from "passport";
 import { Strategy } from "passport-steam";
 import {
-  API_KEY,
-  DOMAIN,
+  STEAM_API_KEY,
+  SERVER_DOMAIN,
   SMTP_DEFAULT_PASSWORD,
   SMTP_DEFAULT_SENDER,
   SMTP_HOSTNAME,
   SMTP_PORT,
   SMTP_USERNAME,
-  TOKEN,
+  STEAM_LOGIN_TOKEN,
 } from "./services/general";
 import session from "express-session";
 const PORT = 4000;
@@ -69,7 +69,7 @@ app.post("/send-email", async (req, res) => {
 
 app.use(
   session({
-    secret: TOKEN!,
+    secret: STEAM_LOGIN_TOKEN!,
     resave: false,
     saveUninitialized: false,
   })
@@ -82,7 +82,7 @@ passport.use(
     {
       returnURL: `http://localhost:${PORT}/auth/steam/return`,
       realm: `http://localhost:${PORT}/`,
-      apiKey: API_KEY,
+      apiKey: STEAM_API_KEY,
     },
     (identifier: any, profile: any, done: any) => {
       return done(null, profile);
@@ -111,7 +111,7 @@ app.get(
     const profileurl = _json.profileurl;
 
     res.redirect(
-      `${DOMAIN}/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}&profileurl=${profileurl}`
+      `${SERVER_DOMAIN}/login-succeed?username=${displayName}&id=${id}&avatar=${avatar}&profileurl=${profileurl}`
     );
   }
 );
@@ -159,5 +159,8 @@ app.get("/getUsers", (req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
+  setInterval(() => {
+    console.log("1 minute passed");
+  }, 60000);
   console.log(`Server is running on http://localhost:${PORT}`);
 });

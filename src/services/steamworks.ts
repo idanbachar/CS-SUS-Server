@@ -8,7 +8,7 @@ import {
   ISteamUserInventory,
   ISteamUserStatsForGame,
 } from "../interfaces/ISteamWorks";
-import { API_KEY, STEAM_BASE_URL } from "./general";
+import { STEAM_API_KEY, STEAM_BASE_URL } from "./general";
 import { IUser } from "../interfaces/IUser";
 import { CreateUserForClient } from "./userDataHelpers";
 
@@ -53,7 +53,7 @@ export const GetFullUserData = async (steamId: string) => {
 };
 
 export const GetPlayerData = async (steamId: string) => {
-  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerSummaries/v2/?key=${API_KEY}&steamids=${steamId}`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&steamids=${steamId}`;
   try {
     const response = await axios.get(endpoint);
     const players = response.data.response.players as ISteamPlayer[];
@@ -69,7 +69,7 @@ export const GetPlayerData = async (steamId: string) => {
 };
 
 export const GetPlayersData = async (steamIds: string) => {
-  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerSummaries/v2/?key=${API_KEY}&steamids=${steamIds}`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&steamids=${steamIds}`;
   try {
     const response = await axios.get(endpoint);
     const players = response.data.response.players as ISteamPlayer[];
@@ -81,7 +81,7 @@ export const GetPlayersData = async (steamIds: string) => {
 };
 
 export const GetFriendsList = async (steamId: string) => {
-  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetFriendList/v0001/?key=${API_KEY}&steamid=${steamId}&relationship=friend`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetFriendList/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&relationship=friend`;
   try {
     const response = await axios.get(endpoint);
     const friends = response.data.friendslist.friends as ISteamFriend[];
@@ -95,7 +95,7 @@ export const GetFriendsList = async (steamId: string) => {
 };
 
 export const GetPlayerBans = async (steamId: string) => {
-  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerBans/v1/?key=${API_KEY}&steamids=${steamId}`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUser/GetPlayerBans/v1/?key=${STEAM_API_KEY}&steamids=${steamId}`;
   try {
     const response = await axios.get(endpoint);
     return response.data.players[0] as ISteamPlayerBans;
@@ -106,7 +106,7 @@ export const GetPlayerBans = async (steamId: string) => {
 };
 
 export const GetOwnedGames = async (steamId: string) => {
-  const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=${steamId}&include_appinfo=1`;
+  const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetOwnedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&include_appinfo=1`;
   try {
     const response = await axios.get(endpoint);
     return response.data.response.games as ISteamGame[];
@@ -118,7 +118,7 @@ export const GetOwnedGames = async (steamId: string) => {
 
 export const GetStatsForCS2 = async (steamId: string) => {
   const appId = "730";
-  const endpoint = `${STEAM_BASE_URL}/ISteamUserStats/GetUserStatsForGame/v0002/?key=${API_KEY}&appid=${appId}&steamid=${steamId}`;
+  const endpoint = `${STEAM_BASE_URL}/ISteamUserStats/GetUserStatsForGame/v0002/?key=${STEAM_API_KEY}&appid=${appId}&steamid=${steamId}`;
   try {
     const response = await axios.get(endpoint);
     return response.data.playerstats as ISteamUserStatsForGame;
@@ -145,7 +145,7 @@ export const GetSteamCSGOInventory = async (steamId: string) => {
 export const GetSteamLevel = async (steamId: string) => {
   const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetSteamLevel/v1/`;
   const params = {
-    key: API_KEY,
+    key: STEAM_API_KEY,
     steamid: steamId,
   };
 
@@ -161,7 +161,7 @@ export const GetSteamLevel = async (steamId: string) => {
 export const GetTotalBadges = async (steamId: string) => {
   const endpoint = `${STEAM_BASE_URL}/IPlayerService/GetBadges/v1/`;
   const params = {
-    key: API_KEY,
+    key: STEAM_API_KEY,
     steamid: steamId,
   };
 

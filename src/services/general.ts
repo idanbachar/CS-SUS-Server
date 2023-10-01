@@ -1,7 +1,7 @@
-export const API_KEY = process.env.API_KEY;
+export const STEAM_API_KEY = process.env.STEAM_API_KEY;
 export const STEAM_BASE_URL = process.env.STEAM_BASE_URL;
-export const TOKEN = process.env.TOKEN;
-export const DOMAIN = process.env.DOMAIN;
+export const STEAM_LOGIN_TOKEN = process.env.STEAM_LOGIN_TOKEN;
+export const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 export const SMTP_HOSTNAME = process.env.SMTP_HOSTNAME;
 export const SMTP_PORT = process.env.SMTP_PORT;
 export const SMTP_USERNAME = process.env.SMTP_USERNAME;
