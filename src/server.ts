@@ -15,8 +15,9 @@ import passport from "passport";
 import { Strategy } from "passport-steam";
 import { API_KEY, DOMAIN, TOKEN } from "./services/general";
 import session from "express-session";
-import axios from "axios";
 const PORT = 4000;
+import nodemailer from "nodemailer";
+import bodyParser from "body-parser";
 
 // require("crypto").randomBytes(48, function (err: any, buffer: any) {
 //   TOKEN = buffer.toString("hex");
@@ -25,6 +26,35 @@ const PORT = 4000;
 const app = express();
 app.use("/", express.static("public"));
 app.use(cors());
+app.use(bodyParser.json());
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "",
+    pass: "",
+  },
+});
+
+app.post("/sendemail", (req, res) => {
+  const { to, subject, text } = req.body;
+
+  const mailOptions = {
+    from: "",
+    to,
+    subject,
+    text,
+  };
+
+  transporter.sendMail(mailOptions, (error: any, info: any) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send("Email sending failed");
+    } else {
+      res.send("Email sent successfully");
+    }
+  });
+});
 
 app.use(
   session({
